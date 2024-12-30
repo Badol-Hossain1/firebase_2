@@ -1,4 +1,8 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from 'firebase/auth';
 import auth from '../../firebase/firebase.config';
 import { useState } from 'react';
 
@@ -16,6 +20,8 @@ const Register = () => {
     console.log('🚀 ~ handleSubmit ~ email:', email);
     const pass = e.target.password.value;
     console.log('🚀 ~ handleSubmit ~ pass:', pass);
+    const name = e.target.name.value;
+    console.log('🚀 ~ handleSubmit ~ name:', name);
 
     if (pass.length < 6) {
       setError('min 6 cha');
@@ -28,6 +34,18 @@ const Register = () => {
       .then((res) => {
         console.log(res.user);
         setSuccess('successfully');
+        // update user profile
+        updateProfile(auth.currentUser, {
+          displayName: name,
+        })
+          .then((res) => {
+            console.log('🚀 ~ .then ~ res:', res);
+          })
+          .catch((error) => {
+            console.log('🚀 ~ .then ~ error:', error);
+          });
+        // send verification mail
+        sendEmailVerification(auth.currentUser).then((res) => console.log(res));
       })
       .catch((error) => {
         setError(error.message);
@@ -38,6 +56,9 @@ const Register = () => {
     <div className="flex justify-center">
       <form onSubmit={handleSubmit} className="">
         <h2 className="text-3xl mb-4 font-bold">please register</h2>
+        <label className="input mb-4 input-bordered flex items-center gap-2">
+          <input type="text" className="grow" name="name" placeholder="name" />
+        </label>
         <label className="input input-bordered flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +96,7 @@ const Register = () => {
             name="password"
           />
           <p onClick={() => setShow(!show)} className="cursor-pointer">
-            show
+            {show ? 'hide' : 'show'}
           </p>
         </label>
         <br />
