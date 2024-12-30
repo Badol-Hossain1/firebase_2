@@ -10,14 +10,16 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <Root />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/register',
-    element: <Register />,
+    children: [
+      {
+        path: 'login', // No need for a leading slash here in child routes
+        element: <Login />,
+      },
+      {
+        path: 'register', // No leading slash here either
+        element: <Register />,
+      },
+    ],
   },
 ]);
 
