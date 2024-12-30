@@ -1,10 +1,38 @@
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import auth from '../../firebase/firebase.config';
+import { useState } from 'react';
+
 const Register = () => {
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [show, setShow] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
+
     const email = e.target.email.value;
     console.log('🚀 ~ handleSubmit ~ email:', email);
     const pass = e.target.password.value;
     console.log('🚀 ~ handleSubmit ~ pass:', pass);
+
+    if (pass.length < 6) {
+      setError('min 6 cha');
+      return;
+    } else if (!/[A-Z]/.test(pass)) {
+      setError('one upercase ');
+      return;
+    }
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then((res) => {
+        console.log(res.user);
+        setSuccess('successfully');
+      })
+      .catch((error) => {
+        setError(error.message);
+        console.log('🚀 ~ createUserWithEmailAndPassword ~ error:', error);
+      });
   };
   return (
     <div className="flex justify-center">
@@ -41,11 +69,20 @@ const Register = () => {
               clipRule="evenodd"
             />
           </svg>
-          <input type="password" className="grow" name="password" />
+          <input
+            type={show ? 'text' : 'password'}
+            className="grow"
+            name="password"
+          />
+          <p onClick={() => setShow(!show)} className="cursor-pointer">
+            show
+          </p>
         </label>
         <br />
         <input className="btn btn-secondary" type="submit" value="register" />
       </form>
+      {error && <p>{error}</p>}
+      {success && <p>{success}</p>}
     </div>
   );
 };
